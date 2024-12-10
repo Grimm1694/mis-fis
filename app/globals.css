@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+.element {
+  background-color: white;
+  color: purple;
+  font-size: 1.875rem;
+  /* 3xl is usually 1.875rem or 30px */
+  border-radius: 9999px;
+  /* Fully rounded (rounded-full) */
+  position: absolute;
+  right: -0.75rem;
+  /* -right-3 (3 * 0.25rem = 0.75rem) */
+  top: 2.25rem;
+  /* top-9 (9 * 0.25rem = 2.25rem) */
+  border: 1px solid red;
+  cursor: pointer;
+}
