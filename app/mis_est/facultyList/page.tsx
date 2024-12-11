@@ -241,11 +241,11 @@ export default function FacultyInfoPage() {
         <table className="min-w-full bg-white shadow-lg rounded-lg">
           <thead>
             <tr>
-              <th className="px-6 py-3 text-left">Name</th>
+              <th className="px-6 py-3 text-left">Title</th>
+              <th className="px-6 py-3 text-center">Name</th>
               <th className="px-6 py-3 text-center">Department</th>
               <th className="px-6 py-3 text-center">Qualification</th>
               <th className="px-6 py-3 text-center">Contact No</th>
-              <th className="px-6 py-3 text-center">Title</th>
             </tr>
           </thead>
           <tbody>
@@ -255,13 +255,13 @@ export default function FacultyInfoPage() {
                 onClick={() => router.push(`/faculty/${faculty.employee_id}`)} // Navigate to slug page
                 className="cursor-pointer hover:bg-gray-100"
               >
+                <td className="px-6 py-3 text-center">{faculty.title}</td>
                 <td className="px-6 py-3">{faculty.faculty_name}</td>
                 <td className="px-6 py-3 text-center">{faculty.department}</td>
                 <td className="px-6 py-3 text-center">
                   {faculty.qualification}
                 </td>
                 <td className="px-6 py-3 text-center">{faculty.contactNo}</td>
-                <td className="px-6 py-3 text-center">{faculty.title}</td>
               </tr>
             ))}
           </tbody>

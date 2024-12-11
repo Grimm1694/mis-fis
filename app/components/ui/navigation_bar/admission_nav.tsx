@@ -315,10 +315,21 @@ const HorizontalNavbar: React.FC = () => {
             <li className="relative">
               <div
                 className="flex items-center space-x-2 cursor-pointer hover:bg-blue-500 py-2 px-2 rounded"
-                onClick={() => router.push("/admin/actions")}
+                onClick={() => router.push("/mis_est/actions")}
               >
                 <MdOutlineContactPhone className="text-sm" />
                 <span className="text-sm">Actions</span>
+              </div>
+            </li>
+
+            {/* Faculty Registration */}
+            <li className="relative">
+              <div
+                className="flex items-center space-x-2 cursor-pointer hover:bg-blue-500 py-2 px-2 rounded"
+                onClick={() => router.push("/faculty")}
+              >
+                <MdOutlineContactPhone className="text-sm" />
+                <span className="text-sm">Faculty Registration</span>
               </div>
             </li>
 

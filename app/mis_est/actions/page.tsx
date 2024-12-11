@@ -203,6 +203,7 @@ export default function AdminUserManagement() {
             >
               <option value="faculty">Faculty</option>
               <option value="admin">Admin</option>
+              <option value="est">EST</option>
               <option value="hod">HOD</option>
               <option value="principal">Principal</option>
             </select>
@@ -220,11 +221,11 @@ export default function AdminUserManagement() {
               }
             >
               <option value="">Select Department</option>
-              <option value="Computer Science">Computer Science</option>
-              <option value="Mathematics">Mathematics</option>
-              <option value="Physics">Physics</option>
-              <option value="Chemistry">Chemistry</option>
-              <option value="Biology">Biology</option>
+              <option value="CS">Computer Science</option>
+              <option value="EC">Electrical and Electronics</option>
+              <option value="PH">Physics</option>
+              <option value="CH">Chemistry</option>
+              <option value="CV">Civil Engineering</option>
             </select>
             <select
               className="input"

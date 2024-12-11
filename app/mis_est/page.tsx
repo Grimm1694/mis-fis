@@ -10,11 +10,11 @@ export default function Home() {
   const { user } = useUser();
 
   //Redirect if not logged in; only run this on the client
-  useEffect(() => {
-    if (typeof window !== "undefined" && !user) {
-      router.push("/"); // Redirect to login
-    }
-  }, [user, router]);
+  // useEffect(() => {
+  //   if (typeof window !== "undefined" && !user) {
+  //     router.push("/"); // Redirect to login
+  //   }
+  // }, [user, router]);
 
   const [studentCounts, setStudentCounts] = useState({
     total_employee: 0,
