@@ -45,17 +45,14 @@ export default async function POST(req, res) {
   
     const insertAcademicDetailsQuery = `
       INSERT INTO [aittest].[dbo].[FacultyAcademicDetails] (
-        employee_id, qualification, department, level, designation
+        employee_id, level
       )
-      VALUES (@employee_id, @qualification, @department, @level, @designation);
+      VALUES (@employee_id, @level);
     `;
 
     await pool.request()
       .input('employee_id', sql.NVarChar, facultyId)
-      .input('qualification', sql.NVarChar, academicSchema.qualification || 'Unknown')
-      .input('department', sql.NVarChar, academicSchema.department || 'Unknown')
       .input('level', sql.NVarChar, academicSchema.level || 'N/A')
-      .input('designation', sql.NVarChar, academicSchema.designation || 'Unknown')
       .query(insertAcademicDetailsQuery);
 
     // Insert into TeachingExperience
@@ -97,40 +94,47 @@ export default async function POST(req, res) {
     }
     // Insert into Awards
     const insertAwardAndRecognitionQuery = `
-        INSERT INTO [aittest].[dbo].[AwardAndRecognition] (
-            faculty_id, recognitionorawardReceived, recognitionorawardFrom, recognitionorawardDate, type
-        )
-        VALUES (@faculty_id, @recognitionorawardReceived, @recognitionorawardFrom, @recognitionorawardDate, @type);
-        `;
-    for (const award of awardsSchema) {
-      await pool.request()
-        .input('faculty_id', sql.NVarChar, facultyId)
-        .input('recognitionorawardReceived', sql.NVarChar, award.awardRecieved || 'Unknown')
-        .input('recognitionorawardFrom', sql.NVarChar, award.awardFrom || 'Unknown')
-        .input('recognitionorawardDate', sql.Date, award.awardDate? award.awardDate : new Date())
-        .input('type', sql.NVarChar, "Award")
-        .query(insertAwardAndRecognitionQuery);
-    }
-    // Insert into Recognitions
-    for (const recognition of recognitionsSchema) {
-      await pool.request()
-        .input('faculty_id', sql.NVarChar, facultyId)
-        .input('recognitionorawardReceived', sql.NVarChar, recognition.recognitionRecieved || 'Unknown')
-        .input('recognitionorawardFrom', sql.NVarChar, recognition.recognitionFrom || 'Unknown')
-        .input('recognitionorawardDate', sql.Date, recognition.recognitionDate ? recognition.recognitionDate : new Date())
-        .input('type', sql.NVarChar, "Recognition")
-        .query(insertAwardAndRecognitionQuery);
-    }
+    INSERT INTO [aittest].[dbo].[AwardAndRecognition] (
+        employee_id, recognitionorawardReceived, recognitionorawardFrom, awardReceived, awardDate, awardFrom, recognitionorawardDate
+    )
+    VALUES (@employee_id, @recognitionorawardReceived, @recognitionorawardFrom, @awardReceived, @awardDate, @awardFrom, @recognitionorawardDate);
+`;
+
+  // Insert Awards
+  for (const award of awardsSchema) {
+    await pool.request()
+      .input('employee_id', sql.NVarChar, facultyId)
+      .input('recognitionorawardReceived', sql.NVarChar, award.awardRecieved || 'Unknown')
+      .input('recognitionorawardFrom', sql.NVarChar, award.awardFrom || 'Unknown')
+      .input('awardReceived', sql.NVarChar, award.awardReceived || 'Unknown')
+      .input('awardDate', sql.Date, award.awardDate ? award.awardDate : null)
+      .input('awardFrom', sql.NVarChar, award.awardFrom || 'Unknown')
+      .input('recognitionorawardDate', sql.Date, award.awardDate ? award.awardDate : null)
+      .query(insertAwardAndRecognitionQuery);
+  }
+
+  // Insert Recognitions
+  for (const recognition of recognitionsSchema) {
+    await pool.request()
+      .input('employee_id', sql.NVarChar, facultyId)
+      .input('recognitionorawardReceived', sql.NVarChar, recognition.recognitionRecieved || 'Unknown')
+      .input('recognitionorawardFrom', sql.NVarChar, recognition.recognitionFrom || 'Unknown')
+      .input('awardReceived', sql.NVarChar, recognition.recognitionRecieved || 'Unknown')
+      .input('awardDate', sql.Date, recognition.recognitionDate ? recognition.recognitionDate : null)
+      .input('awardFrom',sql.NVarChar, recognition.recognitionFrom || 'Unknown')
+      .input('recognitionorawardDate', sql.Date, recognition.recognitionDate ? recognition.recognitionDate : null)
+      .query(insertAwardAndRecognitionQuery);
+  }
+
     // Insert into Responsibilities
     const insertAdditionalResponsibilityQuery = `
-        INSERT INTO [aittest].[dbo].[addtionalResponsibility] (
-            faculty_id, level, fromDate, toDate, responsibility
-        )
-        VALUES (@faculty_id, @level, @fromDate, @toDate, @responsibility);
-        `;
+       INSERT INTO [aittest].[dbo].[addtionalResponsibility] (
+    employee_id, level, fromDate, toDate, responsibility
+    )
+    VALUES (@employee_id, @level, @fromDate, @toDate, @responsibility);  `;
     for (const responsibility of responsibilitiesSchema) {
         await pool.request()
-            .input('faculty_id', sql.NVarChar, facultyId)
+            .input('employee_id', sql.NVarChar, facultyId)
             .input('level', sql.NVarChar, responsibility.level || 'Unknown')
             .input('fromDate', sql.Date, responsibility.fromDate ? new Date(responsibility.fromDate) : new Date())
             .input('toDate', sql.Date, responsibility.toDate ? new Date(responsibility.toDate) : new Date())

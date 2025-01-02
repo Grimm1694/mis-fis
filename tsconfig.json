@@ -22,6 +22,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/faculty/faculty_reg/academic/[facultyId]/page.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/faculty/faculty_reg/academic/[facultyId]/page.tsx", "app/mis_hod/facultylist/page.jsx"],
   "exclude": ["node_modules"]
 }

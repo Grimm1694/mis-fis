@@ -229,6 +229,7 @@ const HorizontalNavbar: React.FC = () => {
                 </ul>
               )}
             </li> 
+
             {/* Faculty_Detail */}
             <li className="relative border border-gray-300 rounded hover:border-blue-500">
               <div
@@ -249,6 +250,39 @@ const HorizontalNavbar: React.FC = () => {
                     <li
                       key={item.label}
                       className="hover:bg-gray-200 px-4 py-2 whitespace-nowrap"
+                    >
+                      <Link href={item.href}>{item.label}</Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+            
+            {/* Consolidation */}
+            <li className="relative border border-gray-300 rounded hover:border-blue-500">
+              <div
+                className="flex items-center space-x-2 cursor-pointer hover:bg-blue-500 py-2 px-2 rounded"
+                onClick={() => toggleSubmenu("consolidation")}
+              >
+                <GrCertificate className="text-sm" />
+                <span className="text-sm">Consolidation</span>
+                {openMenu === "consolidation" ? (
+                  <FaChevronUp />
+                ) : (
+                  <FaChevronDown />
+                )}
+              </div>
+              {openMenu === "consolidation" && (
+                <ul className="absolute left-0 bg-white text-black mt-2 shadow-lg rounded z-50">
+                  {[
+                    { label: "Faculty Personal List", href: "/mis_hod/facultypersonallist" },
+                    { label: "Faculty Education List", href:  "/mis_hod/facultyedulist" },
+                    { label: "Faculty Research List", href: "/mis_hod/facultyresearch" },
+                    { label: "Faculty Academics List", href: "/mis_hod/facultyacademics" },
+                  ].map((item) => (
+                    <li
+                      key={item.label}
+                      className="hover:bg-gray-200 px-2 py-2 whitespace-nowrap"
                     >
                       <Link href={item.href}>{item.label}</Link>
                     </li>

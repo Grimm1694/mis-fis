@@ -44,7 +44,7 @@ export default async function POST(req, res) {
       .input('qualification', sql.NVarChar, personalSchema?.qualification ?? 'N/A')
       .input('department', sql.NVarChar, personalSchema?.department ?? 'Unknown')
       .input('photo', sql.NVarChar, personalSchema?.photo ?? "No photo") // Assuming photo is stored as binary
-      .input('title', sql.NVarChar, personalSchema?.title ?? 'Mr')
+      .input('title', sql.NVarChar, personalSchema?.prefix ?? 'Mr')
       .input('faculty_name', sql.NVarChar, personalSchema?.firstName + ' ' + personalSchema?.lastName ?? 'Sharan Unknown')
       .input('emailId', sql.NVarChar, personalSchema?.emailId ?? 'noemail@example.com')
       .input('contactNo', sql.NVarChar, personalSchema?.contactNo ?? '0000000000')
@@ -56,6 +56,7 @@ export default async function POST(req, res) {
       .input('gender', sql.NVarChar, personalSchema?.gender ?? 'Male')
       .input('nationality', sql.NVarChar, personalSchema?.nationality ?? 'India')
       .input('firstAddressLine', sql.NVarChar, personalSchema?.firstAddressLine1 ?? 'N/A')
+
       .input('correspondenceAddressLine', sql.NVarChar, personalSchema?.correspondenceAddressLine1 ?? 'N/A')
       .input('religion', sql.NVarChar, personalSchema?.religion ?? 'Hindu')
       .input('caste', sql.NVarChar, personalSchema?.caste ?? 'General')
@@ -76,8 +77,8 @@ export default async function POST(req, res) {
       .input('motherName', sql.NVarChar, dependentsSchema?.motherName ?? 'Unknown')
       .input('fatherName', sql.NVarChar, dependentsSchema?.fatherName ?? 'Unknown')
       .input('spouseName', sql.NVarChar, dependentsSchema?.spouseName ?? 'Unknown')
-      .input('children', sql.NVarChar, JSON.stringify(dependentsSchema?.children ?? []))
-      .input('dateOfJoiningDrait', sql.Date, new Date()) // Assuming current date for "Date of Joining"
+      .input('children', sql.NVarChar, dependentsSchema?.children ?? 'Unknown')
+      .input('dateOfJoiningDrait', sql.Date, personalSchema?.dateOfJoiningDrait ? new Date(personalSchema.dateOfJoiningDrait) : new Date())
       .input('designation', sql.VarChar, personalSchema?.designation ?? 'Unknown')
       .input('aided', sql.VarChar, personalSchema?.aided ?? "yes")
       .query(insertPersonalDetailsQuery);

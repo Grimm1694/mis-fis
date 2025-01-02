@@ -42,7 +42,6 @@ const LoginPage = () => {
           department: data.department,
           emp_id: userId,
         });
-
         // Redirect based on the login type and role
         if (loginType === "Faculty") {
           if (data.role === "faculty") {
@@ -56,9 +55,17 @@ const LoginPage = () => {
           } else if (data.role === "est") {
             router.push("/mis_est");
           }
+          else if(data.role === "principal"){
+            router.push("/mis_principal");
+          }
+          else if(data.role === "non-teaching staff")
+            {
+              router.push("/mis_non_teaching_staff");
+            }
         } else if (loginType === "Student") {
           router.push("/mis_student/student_home");
         }
+        
       } else {
         alert("Invalid credentials");
       }

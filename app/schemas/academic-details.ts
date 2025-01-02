@@ -2,10 +2,10 @@ import { z } from "zod";
 
 
 export const academicSchema = z.object({
-  qualification: z.string().min(1, { message: "Qualification is required" }),
-  department: z.string().min(1, { message: "Department is required" }),
-  designation: z.string().min(1, { message: "Designation is required" }),
-  level: z.string().min(1, { message: "Level is required" }),
+  qualification: z.string().min(1, { message: "Qualification is required" }).optional().or(z.literal("")),
+  department: z.string().min(1, { message: "Department is required" }).optional().or(z.literal("")),
+  designation: z.string().min(1, { message: "Designation is required" }).optional().or(z.literal("")),
+  level: z.string().min(1, { message: "Level is required" }).optional().or(z.literal("")),
 });
 
 

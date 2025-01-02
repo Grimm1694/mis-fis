@@ -5,7 +5,8 @@ import { motion } from "framer-motion";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 
-interface User {
+interface User 
+{
   pky: number;
   eid: string;
   ename: string;
@@ -35,8 +36,35 @@ export default function AdminUserManagement() {
   const [newUser, setNewUser] = useState<User>(initialUserState);
   const [errorMessage, setErrorMessage] = useState<string>("");
 
-  // const modalRef = useRef<HTMLDivElement | null>(null);
+  const facultyDesignations = [
+    "Professor",
+    "Associate Professor",
+    "Assistant Professor",
+    "Lecturer",
+  ];
 
+  const nonTeachingDesignations = [
+    "Instructor",
+    "Mechanic",
+    "Helper",
+    "Assistant Instructor",
+    "Registrar",
+    "Superintendent",
+    "Stenographer",
+    "First Division Clerk",
+    "Second Division Clerk",
+    "Typist",
+    "Driver",
+    "Peon",
+    "Watchman",
+    "Sweeper",
+    "Foreman",
+    "Operator",
+    "Second Division Assistant",
+    "First Division Assistant",
+    "Assistant Librarian",
+    "Librarian",
+  ];
   // Fetch Users
   useEffect(() => {
     async function fetchUsers() {
@@ -52,7 +80,6 @@ export default function AdminUserManagement() {
     }
     fetchUsers();
   }, []);
-
   // Handle Delete
   async function handleDelete(id: number) {
     if (!confirm("Are you sure you want to delete this user?")) return;
@@ -70,7 +97,6 @@ export default function AdminUserManagement() {
       alert("Failed to delete user.");
     }
   }
-
   // Add or Update User
   async function handleSaveUser() {
     try {
@@ -80,7 +106,7 @@ export default function AdminUserManagement() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editUser || newUser),
       });
-
+      console.log(newUser);
       if (!response.ok) throw new Error(`Failed to ${editUser ? "update" : "add"} user.`);
 
       alert(`User ${editUser ? "updated" : "added"} successfully!`);
@@ -95,7 +121,6 @@ export default function AdminUserManagement() {
       alert(`Failed to ${editUser ? "update" : "add"} user.`);
     }
   }
-
   // Filter Users
   const filteredUsers = users.filter((user) => {
     const matchesSearch = user.ename.toLowerCase().includes(searchTerm.toLowerCase());
@@ -188,26 +213,7 @@ export default function AdminUserManagement() {
                   : setNewUser({ ...newUser, pass: e.target.value })
               }
             />
-            <label htmlFor="role" className="sr-only">
-              Role
-            </label>
-            <select
-              id="role"
-              className="input"
-              value={editUser ? editUser.role : newUser.role}
-              onChange={(e) =>
-                editUser
-                  ? setEditUser({ ...editUser, role: e.target.value })
-                  : setNewUser({ ...newUser, role: e.target.value })
-              }
-            >
-              <option value="faculty">Faculty</option>
-              <option value="admin">Admin</option>
-              <option value="est">EST</option>
-              <option value="hod">HOD</option>
-              <option value="principal">Principal</option>
-            </select>
-            <label htmlFor="department" className="sr-only">
+                        <label htmlFor="department" className="sr-only">
               Department
             </label>
             <select
@@ -227,6 +233,29 @@ export default function AdminUserManagement() {
               <option value="CH">Chemistry</option>
               <option value="CV">Civil Engineering</option>
             </select>
+           <label htmlFor="role" className="sr-only">
+              Role
+            </label>
+            <select
+              id="role"
+              className="input"
+              value={editUser ? editUser.role : newUser.role}
+              onChange={(e) => {
+                const role = e.target.value;
+                if (editUser) {
+                  setEditUser({ ...editUser, role, designation: "" });
+                } else {
+                  setNewUser({ ...newUser, role, designation: "" });
+                }
+              }}
+            >
+              <option value="faculty">Faculty</option>
+              <option value="admin">Admin</option>
+              <option value="est">EST</option>
+              <option value="hod">HOD</option>
+              <option value="principal">Principal</option>
+              <option value="non-teaching staff">Non Teaching Staff</option>
+            </select>
             <select
               className="input"
               value={editUser ? editUser.designation : newUser.designation}
@@ -237,10 +266,17 @@ export default function AdminUserManagement() {
               }
             >
               <option value="">Select Designation</option>
-              <option value="Professor">Professor</option>
-              <option value="Associate Professor">Associate Professor</option>
-              <option value="Assistant Professor">Assistant Professor</option>
-              <option value="Lecturer">Lecturer</option>
+              {(editUser?.role || newUser.role) === "faculty"
+                ? facultyDesignations.map((designation) => (
+                    <option key={designation} value={designation}>
+                      {designation}
+                    </option>
+                  ))
+                : nonTeachingDesignations.map((designation) => (
+                    <option key={designation} value={designation}>
+                      {designation}
+                    </option>
+                  ))}
             </select>
             <button
               onClick={handleSaveUser}

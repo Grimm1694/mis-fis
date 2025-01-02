@@ -170,6 +170,33 @@ export default function Form() {
 
   return (
     <div>
+      {/* <FacultyProfileNav /> */}
+      <nav className="flex items-center justify-end gap-4 mr-4 mt-2 text-xl text-blue-500 font-bold">
+        <a
+          className={`link hover:underline underline-offset-3`}
+          href="/mis_faculty/faculty_home"
+        >
+          Home
+        </a>
+        <a
+          className={`link hover:underline underline-offset-3`}
+          href={`/faculty/faculty_reg/${facultyId}`}
+        >
+          Personal Details
+        </a>
+        <a
+          className={`link hover:underline underline-offset-3`}
+          href={`/faculty/faculty_reg/academic/${facultyId}`}
+        >
+          Academic Details
+        </a>
+        <a
+          className={`link hover:underline underline-offset-3 `}
+          href={`/faculty/faculty_reg/research/${facultyId}`}
+        >
+          Research Details
+        </a>
+      </nav>
       <section className=" flex flex-col justify-between p-24">
         <FormProvider register={register} errors={errors}>
           <form className="mt-12 py-12" onSubmit={handleSubmit(processForm)}>
@@ -233,11 +260,30 @@ export default function Form() {
                       stepsReference={`previousTeachingExperienceSchema[${index}].instituteName`}
                       type="text"
                     />
-                    <FormField
-                      label="Designation"
-                      stepsReference={`previousTeachingExperienceSchema[${index}].Designation`}
-                      type="text"
-                    />
+                        <div>
+                          <label
+                            htmlFor={`previousTeachingExperienceSchema[${index}].Designation`}
+                            className="block text-sm font-medium text-gray-700"
+                          >
+                            Designation
+                          </label>
+                          <select
+                            id={`previousTeachingExperienceSchema[${index}].Designation`}
+                            {...register(`previousTeachingExperienceSchema.${index}.Designation`)}
+                            className="mt-1 block w-full p-1 py-2.5 rounded-md border bg-gray-50 border-gray-300 shadow-sm"
+                          >
+                            <option value="Professor">Professor</option>
+                            <option value="Assistant Professor">Assistant Professor</option>
+                            <option value="Associate Professor">Associate Professor</option>
+                            <option value="Lecturer">Lecturer</option>
+                          </select>
+                          {errors.previousTeachingExperienceSchema?.[index]?.Designation && (
+                            <p className="mt-2 text-sm text-red-600">
+                              {errors.previousTeachingExperienceSchema[index]?.Designation?.message}
+                            </p>
+                          )}
+                        </div>
+
                     <FormField
                       label="Department"
                       stepsReference={`previousTeachingExperienceSchema[${index}].departmentName`}

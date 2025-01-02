@@ -1,8 +1,6 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-
 import { z } from "zod";
 import { facultyPersonalDetailsSchema } from "../../../schemas/personal-details";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,16 +15,13 @@ import { FormProvider } from "../../../hooks/FormProvider";
 import { useRouter, useSearchParams } from "next/navigation";
 // import ProfilePhotoInput from "@/components/image";
 import axios from "axios";
-
 type Inputs = z.infer<typeof facultyPersonalDetailsSchema>;
-
 const steps: Step[] = [
   {
     id: "Step 1",
     name: "Personal Information",
     fields: [
       "personalSchema.qualification",
-      "personalSchema.title",
       "personalSchema.prefix",
       "personalSchema.firstName",
       "personalSchema.lastName",
@@ -57,6 +52,7 @@ const steps: Step[] = [
       "personalSchema.department",
       "personalSchema.designation",
       "personalSchema.aided",
+      "personalSchema.dateOfJoiningDrait",
       "financialSchema.bankName",
       "financialSchema.accountNo",
       "financialSchema.accountName",
@@ -98,13 +94,34 @@ export default function Form() {
   const delta = currentStep - previousStep;
   const router = useRouter();
   const searchParams = useSearchParams();
+  const departments = [
+    { code: 'EI', title: 'Electronics and Instrumentation Engineering' },
+    { code: 'AE', title: 'Aeronautical Engineering' },
+    { code: 'ME', title: 'Mechanical Engineering' },
+    { code: 'EE', title: 'Electrical Engineering' },
+    { code: 'EC', title: 'Electronics and Communication Engineering' },
+    { code: 'CV', title: 'Civil Engineering' },
+    { code: 'CS', title: 'Computer Science and Engineering' },
+    { code: 'AI', title: 'Artificial Intelligence and Machine Learning' },
+    { code: 'CB', title: 'Computer Science and Business System' },
+    { code: 'ET', title: 'Electronics and Telecommunication Engineering' },
+    { code: 'IM', title: 'Industrial Engineering and Management' },
+    { code: 'IS', title: 'Information Science and Engineering' }
+  ];
+  const designations = [
+    'Professor',
+    'Assistant Professor',
+    'Associate Professor',
+    'Lecturer'
+  ];
   
+  const aidedOptions = ['Yes', 'No'];
   // Extract facultyId from URL using query string
   useEffect(() => {
     const pathname = window.location.pathname; // Get the full path
     const segments = pathname.split("/"); // Split path into segments
     const idFromPath = segments[segments.length - 1]; // Get the last segment (facultyId)
-    console.log(idFromPath);
+    console.log(idFromPath,"idFromPath");
     if (idFromPath) {
         setFacultyId(idFromPath);
     } else {
@@ -124,16 +141,12 @@ export default function Form() {
   } = useForm<Inputs>({
     resolver: zodResolver(facultyPersonalDetailsSchema),
   });
-
   const [isSameAddress, setIsSameAddress] = useState(false);
-
   const firstAddressLine1 = watch("personalSchema.firstAddressLine1");
   const firstAddressLine2 = watch("personalSchema.firstAddressLine2");
   const firstAddressLine3 = watch("personalSchema.firstAddressLine3");
-
   const handleCheckboxChange = (e: any) => {
     setIsSameAddress(e.target.checked);
-
     if (!e.target.checked) {
       // Clear correspondence address fields when unchecked
       setValue("personalSchema.correspondenceAddressLine1", "");
@@ -141,7 +154,6 @@ export default function Form() {
       setValue("personalSchema.correspondenceAddressLine3", "");
     }
   };
-
   // Sync correspondence address fields if checkbox is checked
   useEffect(() => {
     if (isSameAddress) {
@@ -152,14 +164,6 @@ export default function Form() {
   }, [isSameAddress, firstAddressLine1, firstAddressLine2, firstAddressLine3]);
 
   // Initialize useFieldArray for children
-  const {
-    fields: childFields,
-    append: appendChild,
-    remove: removeChild,
-  } = useFieldArray({
-    control,
-    name: "dependentsSchema.children",
-  });
 
   // Initialize useFieldArray for education details
   const {
@@ -187,7 +191,7 @@ export default function Form() {
 
     try {
       // Send the schema data directly without nesting under combinedData
-      const response = await axios.post("/api/facultypersonaldetails", {
+      const response = await axios.post("/api/fac_reg_per", {
         facultyId: facultyId,
         personalSchema: data.personalSchema,
         financialSchema: data.financialSchema,
@@ -212,31 +216,49 @@ export default function Form() {
     }
   };
 
-  //   type FieldName = keyof Inputs;
-
-  //   const nextButtonFunction = async () => {
-  //     const fields = steps[currentStep].fields;
-
-  //     const output = await trigger(fields as FieldName[], { shouldFocus: true });
-
-  //     if (!output) return; // Prevent navigation if validation fails
-
-  //     if (currentStep < steps.length - 1) {
-  //       setPreviousStep(currentStep);
-  //       setCurrentStep((step) => step + 1);
-  //     }
-  //   };
-
-  //   const prevButtonFunction = () => {
-  //     if (currentStep > 0) {
-  //       setPreviousStep(currentStep);
-  //       setCurrentStep((step) => step - 1);
-  //     }
-  //   };
 
   return (
     <div>
+      {/* <FacultyProfileNav /> */}
+      <nav className="flex items-center justify-end gap-4 mr-4 mt-2 text-xl text-blue-500 font-bold">
+        <a
+          className={`link hover:underline underline-offset-3`}
+          href="/mis_faculty/faculty_home"
+        >
+          Home
+        </a>
+        <a
+          className={`link hover:underline underline-offset-3`}
+          href={`/faculty/faculty_reg/${facultyId}`}
+        >
+          Personal Details
+        </a>
+        <a
+          className={`link hover:underline underline-offset-3`}
+          href={`/faculty/faculty_reg/academic/${facultyId}`}
+        >
+          Academic Details
+        </a>
+        <a
+          className={`link hover:underline underline-offset-3 `}
+          href={`/faculty/faculty_reg/research/${facultyId}`}
+        >
+          Research Details
+        </a>
+      </nav>
       <section className=" flex flex-col justify-between p-24">
+        <div className="mt-6 flex justify-end">
+  <button
+    type="button"
+    onClick={handleSubmit(async (data) => {
+      console.log("Submit handler invoked", data);
+      console.log("Faculty ID:", facultyId);
+    })}
+    className="bg-indigo-600 text-white px-6 py-2 rounded-md shadow-sm hover:bg-indigo-700"
+  >
+    Submit
+  </button>
+</div>
         <FormProvider register={register} errors={errors}>
           <form onSubmit={handleSubmit(processForm)} className="mt-12 py-12">
             {currentStep === 0 && (
@@ -253,12 +275,7 @@ export default function Form() {
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   {/* <ProfilePhotoInput className="col-span-2" /> */}
 
-                  <FormField
-                    label="Title"
-                    stepsReference="personalSchema.title"
-                    type="text"
-                  />
-
+                 
                   <div className="grid grid-cols-1 sm:grid-cols-6 gap-6">
                     <div className="col-span-1">
                       <label
@@ -348,13 +365,42 @@ export default function Form() {
                     type="date"
                   />
 
-                  <div>
-                    <FormField
-                      label="Qualification"
-                      stepsReference="personalSchema.qualification"
-                      type="text"
-                    />
-                  </div>
+                    <div>
+                      <label
+                        htmlFor="qualification"
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                       Highest Qualification
+                      </label>
+                      <select
+                        id="qualification"
+                        {...register("personalSchema.qualification")}
+                        className="mt-1 block w-full p-1 py-2.5 rounded-md border bg-gray-50 border-gray-300 shadow-sm"
+                      >
+                        <option value="B.E.">B.E.</option>
+                        <option value="B.Sc.">B.Sc.</option>
+                        <option value="M.Tech.">M.Tech.</option>
+                        <option value="B.Tech.">B.Tech.</option>
+                        <option value="M.Sc.">M.Sc.</option>
+                        <option value="Ph.D">Ph.D</option>
+                        <option value="MCA">MCA</option>
+                        <option value="MBA">MBA</option>
+                        <option value="BBA">BBA</option>
+                        <option value="BCA">BCA</option>
+                        <option value="B.Com">B.Com</option>
+                        <option value="M.Com">M.Com</option>
+                        <option value="B.A.">B.A.</option>
+                        <option value="M.A.">M.A.</option>
+                        <option value="B.Ed.">B.Ed.</option>
+                        <option value="M.Ed.">M.Ed.</option>
+                        <option value="D.Ed.">D.Ed.</option>
+                      </select>
+                      {errors.personalSchema?.qualification && (
+                        <p className="mt-2 text-sm text-red-600">
+                          {errors.personalSchema.qualification.message}
+                        </p>
+                      )}
+                    </div>
 
                   <div>
                     <label
@@ -385,21 +431,84 @@ export default function Form() {
                     type="text"
                   />
                 </div>
-                <FormField
-                  label="Department"
-                  stepsReference="personalSchema.department"
-                  type="text"
-                />
-                <FormField
-                  label="Designation"
-                  stepsReference="personalSchema.designation"
-                  type="text"
-                />
-                <FormField
-                  label="Aided"
-                  stepsReference="personalSchema.aided"
-                  type="text"
-                />
+        <div>
+          <label
+            htmlFor="department"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Department
+          </label>
+          <select
+            id="department"
+            {...register("personalSchema.department")}
+            className="mt-1 block w-full p-1 py-2.5 rounded-md border bg-gray-50 border-gray-300 shadow-sm"
+          >
+            <option value="">Select Department</option>
+            {departments.map((dept) => (
+              <option key={dept.code} value={dept.code}>
+                {dept.title}
+              </option>
+            ))}
+          </select>
+          {errors.personalSchema?.department && (
+            <p className="mt-2 text-sm text-red-600">
+              {errors.personalSchema.department.message}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label
+            htmlFor="designation"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Designation
+            </label>
+          <select
+            id="designation"
+            {...register("personalSchema.designation")}
+            className="mt-1 block w-full p-1 py-2.5 rounded-md border bg-gray-50 border-gray-300 shadow-sm"
+          >
+            <option value="">Select Designation</option>
+            {designations.map((designation) => (
+              <option key={designation} value={designation}>
+                {designation}
+              </option>
+            ))}
+          </select>
+          {errors.personalSchema?.designation && (
+            <p className="mt-2 text-sm text-red-600">
+              {errors.personalSchema.designation.message}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label
+            htmlFor="aided"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Aided
+          </label>
+          <select
+            id="aided"
+            {...register("personalSchema.aided")}
+            className="mt-1 block w-full p-1 py-2.5 rounded-md border bg-gray-50 border-gray-300 shadow-sm"
+          ><option value="">Select Aided</option>
+          {aidedOptions.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+        {errors.personalSchema?.aided && (
+          <p className="mt-2 text-sm text-red-600">
+            {errors.personalSchema.aided.message}
+          </p>
+        )}
+      </div>
+      <FormField label="Date of Joining DRAIT" stepsReference="personalSchema.dateOfJoiningDrait" type="date" />
+      
               </motion.div>
             )}
 
@@ -867,11 +976,43 @@ export default function Form() {
                     key={item.id}
                     className="grid grid-cols-1 gap-6 sm:grid-cols-2"
                   >
-                    <FormField
-                      label="Program (Class)"
-                      stepsReference={`educationSchema.${index}.class`}
-                      type="text"
-                    />
+                    <div>
+                      <label
+                        htmlFor={`educationSchema.${index}.class`}
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        Program (Class)
+                      </label>
+                      <select
+                        id={`educationSchema.${index}.class`}
+                        {...register(`educationSchema.${index}.class`)}
+                        className="mt-1 block w-full p-1 py-2.5 rounded-md border bg-gray-50 border-gray-300 shadow-sm"
+                      >
+                        <option value="B.E.">B.E.</option>
+                        <option value="B.Sc.">B.Sc.</option>
+                        <option value="M.Tech.">M.Tech.</option>
+                        <option value="B.Tech.">B.Tech.</option>
+                        <option value="M.Sc.">M.Sc.</option>
+                        <option value="Ph.D">Ph.D</option>
+                        <option value="MCA">MCA</option>
+                        <option value="MBA">MBA</option>
+                        <option value="BBA">BBA</option>
+                        <option value="BCA">BCA</option>
+                        <option value="B.Com">B.Com</option>
+                        <option value="M.Com">M.Com</option>
+                        <option value="B.A.">B.A.</option>
+                        <option value="M.A.">M.A.</option>
+                        <option value="B.Ed.">B.Ed.</option>
+                        <option value="M.Ed.">M.Ed.</option>
+                        <option value="D.Ed.">D.Ed.</option>
+                      </select>
+                      {errors.educationSchema?.[index]?.class && (
+                        <p className="mt-2 text-sm text-red-600">
+                          {errors.educationSchema[index]?.class?.message}
+                        </p>
+                      )}
+                    </div>
+
 
                     <FormField
                       label="USN"
@@ -1016,111 +1157,11 @@ export default function Form() {
                   />
 
                   {/* Children */}
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 py-2">
-                      Children
-                    </label>
-
-                    {childFields.map((child, index) => (
-                      <div
-                        key={child.id}
-                        className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4"
-                      >
-                        {/* Child Name */}
-                        <FormField
-                          label="Name"
-                          stepsReference={`dependentsSchema.children[${index}].name`}
-                          type="text"
-                        />
-
-                        {/* Child Gender */}
-                        <div>
-                          <label
-                            htmlFor={`children[${index}].gender`}
-                            className="block text-sm font-medium text-gray-700"
-                          >
-                            Gender
-                          </label>
-                          <select
-                            id={`children[${index}].gender`}
-                            {...register(
-                              `dependentsSchema.children.${index}.gender`
-                            )}
-                            className="mt-1 block w-full p-1 py-2.5 rounded-md border bg-gray-50 border-gray-300 shadow-sm"
-                          >
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Prefer not to say">
-                              Prefer not to say
-                            </option>
-                          </select>
-                          {errors.dependentsSchema?.children?.[index]
-                            ?.gender && (
-                            <p className="mt-2 text-sm text-red-600">
-                              {
-                                errors.dependentsSchema.children[index].gender
-                                  .message
-                              }
-                            </p>
-                          )}
-                        </div>
-
-                        {/* Child Date of Birth */}
-                        <div>
-                          <label
-                            htmlFor={`children[${index}].dob`}
-                            className="block text-sm font-medium text-gray-700"
-                          >
-                            Date of Birth
-                          </label>
-                          <input
-                            type="date"
-                            id={`children[${index}].dob`}
-                            {...register(
-                              `dependentsSchema.children.${index}.dob`
-                            )}
-                            className="mt-1 block w-full p-1 py-1.5 rounded-md border bg-gray-50 border-gray-300 shadow-sm"
-                          />
-                          {errors.dependentsSchema?.children?.[index]?.dob && (
-                            <p className="mt-2 text-sm text-red-600">
-                              {
-                                errors.dependentsSchema.children[index].dob
-                                  .message
-                              }
-                            </p>
-                          )}
-                        </div>
-
-                        {/* Remove Child Button */}
-                        <div className="col-span-3 flex justify-end">
-                          <button
-                            type="button"
-                            onClick={() => removeChild(index)}
-                            className="text-red-600 text-sm"
-                          >
-                            Remove Child
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-
-                    {/* Add Child Button */}
-                    <div className="mt-4">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          appendChild({
-                            name: "",
-                            gender: "Male",
-                            dob: new Date(),
-                          })
-                        }
-                        className="text-indigo-600 text-sm"
-                      >
-                        + Add Child
-                      </button>
-                    </div>
-                  </div>
+                  <FormField
+                    label="Number of Children"
+                    stepsReference="dependentsSchema.children"
+                    type="number"
+                  />
                 </div>
               </motion.div>
             )}
@@ -1395,29 +1436,12 @@ export default function Form() {
                           </td>
                           <td>{watch("dependentsSchema.spouseName")}</td>
                         </tr>
-                        {watch("dependentsSchema.children")?.length > 0 && (
-                          <tr>
-                            <td className="font-medium text-gray-700">
-                              Children:
-                            </td>
-                            <td>
-                              <ul className="list-disc ml-4">
-                                {watch("dependentsSchema.children").map(
-                                  (child, index) => (
-                                    <li key={index}>
-                                      {child.name}, {child.gender},{" "}
-                                      {child.dob
-                                        ? new Date(
-                                            child.dob
-                                          ).toLocaleDateString()
-                                        : "N/A"}
-                                    </li>
-                                  )
-                                )}
-                              </ul>
-                            </td>
-                          </tr>
-                        )}
+                        <tr>
+                          <td className="font-medium text-gray-700">
+                            Number of Children:
+                          </td>
+                          <td>{watch("dependentsSchema.children")}</td>
+                        </tr>
                       </tbody>
                     </table>
                   </div>
@@ -1456,63 +1480,62 @@ export default function Form() {
 
                 {/* Submit Button */}
                 <div className="mt-6 flex justify-end">
-                  <button
-                    type="button"
-                    onClick={handleSubmit(async (data) => {
-                      try {
-                        // Create the request body
-                        const requestBody = {
-                          facultyId: facultyId,
-                          personalSchema: data.personalSchema,
-                          financialSchema: data.financialSchema,
-                          educationSchema: data.educationSchema,
-                          dependentsSchema: data.dependentsSchema,
-                        };
+  <button
+    type="button"
+    onClick={handleSubmit(async (data) => {
+      console.log("Submit handler invoked with data:", data);
 
-                        console.log(requestBody.facultyId)
+      if (!facultyId) {
+        alert("Faculty ID is missing.");
+        return;
+      }
 
-                        // Send the POST request using fetch
-                        const response = await fetch("/api/fac_reg_per", {
-                          method: "POST",
-                          headers: {
-                            "Content-Type": "application/json", // Tell the server the data is in JSON format
-                          },
-                          body: JSON.stringify(requestBody), // Convert the request body to JSON string
-                        });
+      const requestBody = {
+        personalSchema: data.personalSchema,
+        financialSchema: data.financialSchema,
+        educationSchema: data.educationSchema,
+        dependentsSchema: data.dependentsSchema,
+        facultyId: facultyId,
+      };
 
-                        // Check if the request was successful
-                        if (response.ok) {
-                          const responseData = await response.json(); // Parse the response JSON
+      console.log("Request body:", requestBody);
 
-                          if (responseData.success) {
-                            console.log(
-                              "Data saved successfully:",
-                              responseData
-                            );
-                            alert("Form submitted successfully!");
-                            router.push(`/faculty/faculty_reg/academic/${facultyId}`); // Redirect to home page after successful submission
-                            // Reset the form after submission
-                            reset(); // Reset the form values to initial state
-                            setCurrentStep(0); // Go back to the first step (optional)
-                          } else {
-                            alert("Error submitting form. Please try again.");
-                          }
-                        } else {
-                          // If response is not ok, handle error
-                          alert(
-                            "Error submitting form. Server returned an error."
-                          );
-                        }
-                      } catch (error) {
-                        console.error("Submission error:", error);
-                        alert("An error occurred while submitting the form.");
-                      }
-                    })}
-                    className="bg-indigo-600 text-white px-6 py-2 rounded-md shadow-sm hover:bg-indigo-700"
-                  >
-                    Submit
-                  </button>
-                </div>
+      try {
+        const response = await fetch("/api/fac_reg_per", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        });
+
+        console.log("Response status:", response.status);
+
+        if (response.ok) {
+          const responseData = await response.json();
+          console.log("Response data:", responseData);
+
+          if (responseData.success) {
+            alert("Form submitted successfully!");
+            router.push(`/faculty/faculty_reg/academic/${facultyId}`);
+            reset();
+          } else {
+            alert("Error submitting form: " + responseData.message);
+          }
+        } else {
+          alert("Failed to submit form. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error during submission:", error);
+        alert("An error occurred. Please try again.");
+      }
+    })}
+    className="bg-indigo-600 text-white px-6 py-2 rounded-md shadow-sm hover:bg-indigo-700"
+  >
+    Submit
+  </button>
+</div>
+
               </motion.div>
             )}
           </form>

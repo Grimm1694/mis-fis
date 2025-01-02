@@ -228,6 +228,33 @@ useEffect(() => {
   }
   return (
     <div>
+      {/* <FacultyProfileNav /> */}
+      <nav className="flex items-center justify-end gap-4 mr-4 mt-2 text-xl text-blue-500 font-bold">
+        <a
+          className={`link hover:underline underline-offset-3`}
+          href="/mis_faculty/faculty_home"
+        >
+          Home
+        </a>
+        <a
+          className={`link hover:underline underline-offset-3`}
+          href={`/faculty/faculty_reg/${facultyId}`}
+        >
+          Personal Details
+        </a>
+        <a
+          className={`link hover:underline underline-offset-3`}
+          href={`/faculty/faculty_reg/academic/${facultyId}`}
+        >
+          Academic Details
+        </a>
+        <a
+          className={`link hover:underline underline-offset-3 `}
+          href={`/faculty/faculty_reg/research/${facultyId}`}
+        >
+          Research Details
+        </a>
+      </nav>
       <section className=" flex flex-col justify-between p-24">
         {/* <FormProgress steps={steps} currentStep={currentStep} /> */}
 

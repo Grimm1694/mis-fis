@@ -22,9 +22,8 @@ export const personalSchema = z.object({
   //     message: "Correct format - first three letters followed by 2 digits",
   //   }), //first three letters then 2 digits
   qualification: z.string().min(1, { message: "Qualification is required" }),
-  //photo: z.string({ message: "Photo is required" }),
-  title: z.string().min(1, { message: "Qualification is required" }),
-  department:z.string().min(1, { message: "Department is required" }),
+  //photo: z.string({ message: "Photo is required" }).optional().or(z.literal("")),
+   department:z.string().min(1, { message: "Department is required" }),
   designation: z.string().min(1, { message: "Designation is required" }),
   aided : z.string().min(1, { message: "Field is required" }),
   prefix: z.enum(["Mr", "Mrs", "Ms", "Dr", "Prof"]),
@@ -88,6 +87,7 @@ export const personalSchema = z.object({
   languagesToWrite: z.array(z.string(), {
     message: "Please select a language",
   }),
+  dateOfJoiningDrait: z.string().min(1, { message: "Date of joining is required" }).optional().or(z.literal("")),
 });
 
 export const financialSchema = z.object({
@@ -123,6 +123,7 @@ export const financialSchema = z.object({
 
 });
 
+
 export const educationSchema = z.array(
   //facultyId: z.string().min(1, { message: "Faculty ID is required" }),
   z.object({
@@ -150,13 +151,7 @@ export const dependentsSchema = z.object({
   motherName: z.string().optional().or(z.literal("")),
   fatherName: z.string().optional().or(z.literal("")),
   spouseName: z.string().optional().or(z.literal("")),
-  children: z.array(
-    z.object({
-      name: z.string().min(1, { message: "Name is required" }).optional().or(z.literal("")),
-      gender: z.enum(["Male", "Female", "Prefer not to say"]).optional().or(z.literal("")),
-      dob: z.coerce.date({ message: "Date of birth is required" }).optional().or(z.literal("")),
-    })
-  ),
+  children: z.string().optional().or(z.literal("")),
 });
 
 export const facultyPersonalDetailsSchema = z.object({

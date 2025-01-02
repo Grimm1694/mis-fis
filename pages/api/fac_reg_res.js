@@ -1,5 +1,17 @@
 import {connectToDatabase} from '../../app/config/dbconfig';
 import sql from 'mssql';
+function validateDate(date) {
+    const parsedDate = new Date(date);
+    if (
+        isNaN(parsedDate.getTime()) || 
+        parsedDate < new Date("1900-01-01") || 
+        parsedDate > new Date("2079-06-06")
+    ) {
+        return new Date(); // Return null for invalid dates
+    }
+    return parsedDate; // Return valid date
+}
+
 export default async function POST(req, res) 
 {
     try
@@ -31,6 +43,7 @@ export default async function POST(req, res)
         console.log("Validated Request Body:", {
             facultyResearchSchema,
             nationalJournalDetailsSchema,
+
             eventsAttendedSchema,
             eventsOrganizedSchema,
             internationalJournalDetailsSchema,
@@ -83,7 +96,7 @@ export default async function POST(req, res)
                 .input('pageNo', sql.VarChar, journalDetails.pageNo || 'Unknown')
                 .input('authors', sql.VarChar, Array.isArray(journalDetails.authors) ? JSON.stringify(journalDetails.authors) : '')
             .input('publishedUnder', sql.VarChar, journalDetails.publishedUnder || 'Unknown')
-                .input('impactFactor', sql.Float, journalDetails.impactFactor || 0)
+                .input('impactFactor', sql.NVarChar, journalDetails.impactFactor || 0)
                 .input('quartile', sql.VarChar, journalDetails.quartile || 'Unknown')
                 .input('sponsor', sql.VarChar, journalDetails.sponsor || 'Unknown')
                 .input('venue', sql.VarChar, journalDetails.venue || 'Unknown')
@@ -105,7 +118,7 @@ export default async function POST(req, res)
             .input('pageNo', sql.VarChar,  internationalJournalDetailsSchema1.pageNo     || 'Unknown')
             .input('authors', sql.VarChar, Array.isArray(internationalJournalDetailsSchema1.authors) ? JSON.stringify(internationalJournalDetailsSchema1.authors) : '')
             .input('publishedUnder', sql.VarChar,  internationalJournalDetailsSchema1.publishedUnder|| 'Unknown')
-            .input('impactFactor', sql.Float,  internationalJournalDetailsSchema1.impactFactor || 0)
+            .input('impactFactor', sql.NVarChar,  internationalJournalDetailsSchema1.impactFactor || 0)
             .input('quartile', sql.VarChar,  internationalJournalDetailsSchema1.quartile || 'Unknown')
             .input('sponsor', sql.VarChar,  internationalJournalDetailsSchema1.sponsor || 'Unknown')
             .input('venue', sql.VarChar,  internationalJournalDetailsSchema1.venue || 'Unknown')
@@ -127,7 +140,7 @@ export default async function POST(req, res)
             .input('pageNo', sql.VarChar, nationalConferenceDetailsSchema1.pageNo     || 'Unknown')
             .input('authors', sql.VarChar, Array.isArray(nationalConferenceDetailsSchema1.authors) ? JSON.stringify(nationalConferenceDetailsSchema1.authors) : '')
            .input('publishedUnder', sql.VarChar, nationalConferenceDetailsSchema1.publishedUnder|| 'Unknown')
-            .input('impactFactor', sql.Float, nationalConferenceDetailsSchema1.impactFactor || 0)
+            .input('impactFactor', sql.NVarChar, nationalConferenceDetailsSchema1.impactFactor || 0)
             .input('quartile', sql.VarChar, nationalConferenceDetailsSchema1.quartile || 'Unknown')
             .input('sponsor', sql.VarChar, nationalConferenceDetailsSchema1.sponsor || 'Unknown')
             .input('venue', sql.VarChar, nationalConferenceDetailsSchema1.venue || 'Unknown')
@@ -149,7 +162,7 @@ export default async function POST(req, res)
             .input('pageNo', sql.VarChar, internationalConferenceDetailsSchema1.pageNo     || 'Unknown')
             .input('authors', sql.VarChar, Array.isArray(internationalConferenceDetailsSchema1.authors) ? JSON.stringify(internationalConferenceDetailsSchema1.authors) : '')
           .input('publishedUnder', sql.VarChar, internationalConferenceDetailsSchema1.publishedUnder|| 'Unknown')
-            .input('impactFactor', sql.Float, internationalConferenceDetailsSchema1.impactFactor || 0)
+            .input('impactFactor', sql.NVarChar, internationalConferenceDetailsSchema1.impactFactor || 0)
             .input('quartile', sql.VarChar, internationalConferenceDetailsSchema1.quartile || 'Unknown')
             .input('sponsor', sql.VarChar, internationalConferenceDetailsSchema1.sponsor || 'Unknown')
             .input('venue', sql.VarChar, internationalConferenceDetailsSchema1.venue || 'Unknown')
@@ -185,11 +198,11 @@ export default async function POST(req, res)
             }
             const insertConsultancyQuery = `
                 INSERT INTO [aittest].[dbo].[Consultancy] (
-                    employee_id, faculty_name, sanctionedDate, projectPeriod, amount, 
+                    employee_id,  sanctionedDate, projectPeriod, amount, 
                     principalInvestigator, coPrincipalInvestigator, status
                 )
                 VALUES (
-                    @employee_id, @faculty_name, @sanctionedDate, @projectPeriod, @amount, 
+                    @employee_id, @sanctionedDate, @projectPeriod, @amount, 
                     @principalInvestigator, @coPrincipalInvestigator, @status
                 );
                 `;
@@ -269,8 +282,8 @@ export default async function POST(req, res)
                 for(const eventsAttendedSchema1 of eventsAttended)
                 {
                 await pool.request()
-                .input('fromDate', sql.Date, eventsAttendedSchema1.fromDate || new Date())
-                .input('toDate', sql.Date, eventsAttendedSchema1.toDate || new Date())
+                .input('fromDate', sql.Date, validateDate(eventsAttendedSchema1.fromDate) || new Date())
+                .input('toDate', sql.Date, validateDate(eventsAttendedSchema1.toDate) || new Date())
                 .input('organizer', sql.NVarChar, eventsAttendedSchema1.organizer || 'Unknown')
                 .input('venue', sql.NVarChar, eventsAttendedSchema1.venue    || 'Unknown')
                 .input('sponsor', sql.NVarChar, eventsAttendedSchema1.sponsor || 'Unknown')
