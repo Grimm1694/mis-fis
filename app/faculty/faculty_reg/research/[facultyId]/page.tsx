@@ -3,7 +3,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 import { z } from "zod";
-import { facultyResearchDetailsSchema } from "../../../../schemas/research-details";
+import { facultyResearchDetailsSchema, research_experienceSchema } from "../../../../schemas/research-details";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, SubmitHandler, useFieldArray } from "react-hook-form";
 import { identity, remove } from "lodash";
@@ -14,6 +14,7 @@ import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
 
 type Inputs = z.infer<typeof facultyResearchDetailsSchema>;
+
 
 const steps: Step[] = [
   {
@@ -38,7 +39,7 @@ const steps: Step[] = [
         "patentsSchema"
         ,"researchScholarDetailsSchema"
         ,"publicationsSchema"
-      ,"professionalMembershipsSchema"],
+      ,"professionalMembershipsSchema","research_experienceSchema"],
   },
   { id: "Step 8", name: "Complete", fields: [] },
 ];
@@ -128,6 +129,11 @@ export default function Form() {
     append: appendProfessionalMembership,
     remove: removeProfessionalMembership,
   } = useFieldArray({ control, name: "professionalMembershipSchema" });
+  const {
+    fields:research_experience,
+    append: appendResearchExperience,
+    remove: removeResearchExperience,
+  } = useFieldArray({ control, name: "research_experienceSchema" });  
 
   // const {
   //   fields: researchScholar,
@@ -1125,7 +1131,7 @@ useEffect(() => {
                 >
                   + Add a Research Project
                 </button>
-
+                
                 <h2 className="text-2xl font-semibold text-gray-900 mb-6">
                   Consultancy
                 </h2>
@@ -1224,8 +1230,54 @@ useEffect(() => {
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
                 className="space-y-6  mb-[10px] border border-gray-300 rounded-md p-6 shadow-md"
-
               >
+                <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+                  Research Experience Details
+                </h2>
+                {research_experience.map((field, index) => (
+                  <div key={field.id} className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+
+                    <FormField
+                      label="Area of research"
+                      stepsReference={`research_experienceSchema[${index}].areaofresearch`}
+                      type="text"
+                    />
+                    <FormField
+                      label="From Date"
+                      stepsReference={`research_experienceSchema[${index}].from_date`}
+                      type="date"
+                    />
+                    <FormField
+                      label="To Date"
+                      stepsReference={`research_experienceSchema[${index}].to_date`}
+                      type="date"
+                    />
+                    <div className="col-span-2 flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => removeResearchExperience(index)}
+                        className="text-red-500 text-sm"
+                      >
+                        Remove Research Experience
+                      </button>
+                    </div>
+
+                  </div>
+                  
+                ))}
+                                <button
+                  type="button"
+                  onClick={() =>
+                    appendResearchExperience({
+                      areaofresearch: "",
+                      from_date :new Date() ,
+                      to_date : new Date(),
+                    })
+                  }
+                  className="text-blue-500 text-sm"
+                >
+                  + Add Research Experince
+                </button>
                 <h2 className="text-2xl font-semibold text-gray-900 mb-6">
                   Patents
                 </h2>
@@ -1338,6 +1390,7 @@ useEffect(() => {
                 >
                   + Add Patent
                 </button>
+              
               </motion.div>
             )}
 
@@ -2224,6 +2277,7 @@ useEffect(() => {
                         eventsAttendedSchema: data.eventsAttendedSchema,
                         eventsOrganizedSchema: data.eventsOrganizedSchema,
                         publicationsSchema: data.publicationsSchema,
+                        research_experienceSchema: data.research_experienceSchema,
                         facultyId:facultyId,
                       };
                       console.log("Payload being sent to API:", payload);

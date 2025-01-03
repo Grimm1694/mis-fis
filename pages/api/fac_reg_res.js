@@ -18,6 +18,7 @@ export default async function POST(req, res)
     {
         const { 
             facultyResearchSchema,
+
                         nationalJournalDetailsSchema,
                         internationalJournalDetailsSchema,
                         nationalConferenceDetailsSchema,
@@ -29,10 +30,11 @@ export default async function POST(req, res)
                         eventsAttendedSchema,
                         eventsOrganizedSchema,
                         publicationsSchema,
+                        research_experienceSchema,
                         facultyId
           } = req.body;
       
-        if (!facultyResearchSchema || !nationalJournalDetailsSchema || !eventsAttendedSchema || !eventsOrganizedSchema ||  !internationalJournalDetailsSchema || !nationalConferenceDetailsSchema || !internationalConferenceDetailsSchema || !researchGrantsSchema || !consultancySchema || !patentsSchema ||  !publicationsSchema || !professionalMembershipSchema || !facultyId)
+        if (!facultyResearchSchema || !nationalJournalDetailsSchema || !eventsAttendedSchema || !eventsOrganizedSchema ||  !internationalJournalDetailsSchema || !nationalConferenceDetailsSchema || !internationalConferenceDetailsSchema || !researchGrantsSchema || !consultancySchema || !patentsSchema ||  !publicationsSchema || !professionalMembershipSchema || !facultyId || !research_experienceSchema)
         {
             return res.status(400).json({
                 success: false,
@@ -41,19 +43,7 @@ export default async function POST(req, res)
         }
 
         console.log("Validated Request Body:", {
-            facultyResearchSchema,
-            nationalJournalDetailsSchema,
-
-            eventsAttendedSchema,
-            eventsOrganizedSchema,
-            internationalJournalDetailsSchema,
-            nationalConferenceDetailsSchema,
-            internationalConferenceDetailsSchema,
-            researchGrantsSchema,
-            consultancySchema,
-            patentsSchema,
-            publicationsSchema,
-            professionalMembershipSchema,
+            research_experienceSchema,
             facultyId
         });
         const pool = await connectToDatabase(); 
@@ -76,6 +66,7 @@ export default async function POST(req, res)
                 employee_id, typeOfPublication, title, doi, issn, joConName, 
                 yearOfPublication, pageNo, authors, publishedUnder, impactFactor, 
                 quartile, sponsor, venue, volume, issueNo
+            )
             )
             VALUES (
                 @employee_id, @typeOfPublication, @title, @doi, @issn, @joConName, 
@@ -170,6 +161,8 @@ export default async function POST(req, res)
             .input('issueNo', sql.NVarChar, internationalConferenceDetailsSchema1.issueNo || 'Unknown')
             .query(insertConferenceAndJournalQuery);
             }
+            
+
             const insertResearchProjectsQuery = `
             INSERT INTO [aittest].[dbo].[ResearchProjects] (
                 employee_id, projectTitle, pi, coPi, dOfSanction, 
@@ -195,7 +188,27 @@ export default async function POST(req, res)
                 .input('status', sql.NVarChar, researchGrantsSchemas.status)
                 .query(insertResearchProjectsQuery); // Correct usage
  
+
             }
+            const insertResearchExperienceQuery = `
+                INSERT INTO [aittest].[dbo].[research_experience] (
+                    employee_id, areaofresearch, from_date, to_date
+                )
+                VALUES (
+                    @employee_id, @areaofresearch, @from_date, @to_date
+                );
+            `;
+
+            const researchExperienceData = research_experienceSchema || [];
+            for (const experience of researchExperienceData) {
+                await pool.request()
+                    .input('employee_id', sql.NVarChar, facultyId)
+                    .input('areaofresearch', sql.NVarChar, experience.areaofresearch)
+                    .input('from_date', sql.Date, experience.from_date)
+                    .input('to_date', sql.Date, experience.to_date)
+                    .query(insertResearchExperienceQuery);  // Insert into research_experience
+            }
+
             const insertConsultancyQuery = `
                 INSERT INTO [aittest].[dbo].[Consultancy] (
                     employee_id,  sanctionedDate, projectPeriod, amount, 

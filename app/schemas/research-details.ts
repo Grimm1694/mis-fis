@@ -10,6 +10,12 @@ export const facultyResearchSchema = z.object({
   researchId: z.string().optional(),
 });
 
+
+export const research_experienceSchema = z.array(z.object({
+  areaofresearch: z.string().optional(),
+  from_date: z.coerce.date().optional(),
+  to_date: z.coerce.date().optional(),
+}))
 export const nationalJournalDetailsSchema = z.array(
   z.object({
     titleOfResearchPaper: z.string().optional(),
@@ -152,4 +158,7 @@ export const facultyResearchDetailsSchema = z.object({
   eventsOrganizedSchema: eventsOrganizedSchema.optional(),
   publicationsSchema: publicationsSchema.optional(),
   professionalMembershipSchema: professionalMembershipSchema.optional(),
+  research_experienceSchema: research_experienceSchema.optional(),
 });
+
+

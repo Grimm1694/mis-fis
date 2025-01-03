@@ -21,7 +21,10 @@ export const nationalJournalDetailsSchema = z.array(
   })
 );
 
+
 export const internationalJournalDetailsSchema = nationalJournalDetailsSchema; // Reuse the schema
+
+
 
 export const nationalConferenceDetailsSchema = z.array(
   z.object({
